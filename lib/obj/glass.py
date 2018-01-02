@@ -67,7 +67,7 @@ class Glass(Client, metaclass=Singleton):
 
         super().run(*args, **kwargs)
 
-    def register_delegate(self, event: str, delegate: type(Delegate)):
+    def register_delegate(self, event: str, delegate: typing.Type[Delegate]):
         """Register a delegate class to handler a specific event."""
 
         delegate = delegate(event, self)
