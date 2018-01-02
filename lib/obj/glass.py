@@ -9,7 +9,7 @@ from lib.obj.singleton import Singleton
 class Delegate:
     """Handles any single event."""
 
-    override_warning = True
+    _override_warning = True
 
     def __init__(self, event: str, owner: "Glass"):
         self.event = event
@@ -18,7 +18,7 @@ class Delegate:
 
     @staticmethod
     def _handler(event: str, handlers: typing.List[typing.Callable]) -> typing.Callable:
-        """Implements a Discord event handler factory."""
+        """Implements a Discord event handler builder."""
 
         async def handle(*args, **kwargs) -> None:
             for handler in handlers:
@@ -44,10 +44,10 @@ class Delegate:
         """Modify the given handler to change how this delegate uses the handler.
         Must return an asynchronous (awaitable) callable."""
 
-        if type(self) is not Delegate and self.override_warning:
+        if type(self) is not Delegate and self._override_warning:
             print("Subclass '{}' of class 'Delegate' should override method 'modify_handler'!"
                   .format(self.__class__.__name__), file=sys.stderr)
-            self.override_warning = False
+            self._override_warning = False
 
         return handler
 
@@ -67,7 +67,7 @@ class Glass(Client, metaclass=Singleton):
 
         super().run(*args, **kwargs)
 
-    def register_delegate(self, event: str, delegate: typing.Type[Delegate]):
+    def register_delegate(self, event: str, delegate: typing.Type[Delegate]) -> None:
         """Register a delegate class to handler a specific event."""
 
         delegate = delegate(event, self)
@@ -76,17 +76,31 @@ class Glass(Client, metaclass=Singleton):
             raise ValueError("parameter 'delegate' must be subclass of class 'Delegate'!")
         else:
             if event in self.delegates:
-                if type(self.delegates[event] is Delegate):
+                # If currently using a default delegate, move handlers to the new delegate
+                if type(self.delegates[event]) is Delegate:
                     handlers = self.delegates[event].handlers
                     delegate.handlers.extend(handlers)
                 else:
+                    # A non-default delegate already exists
                     raise ValueError("Delegate for '{}' already exists!".format(event))
 
             self.delegates[event] = delegate
 
+    def get_delegate(self, event: str, type_assertion: typing.Type = None) -> typing.Union[None, Delegate]:
+        """Returns the delegate for the given event, if one exists."""
+        if event in self.delegates:
+            if type_assertion and type_assertion is not type(self.delegates[event]):
+                raise ValueError("Delegate for event '{}' is not of type '{}'!".format(event, type_assertion.__name__))
+
+            return self.delegates[event]
+
     def register_event(self, event: str, handler: typing.Callable) -> None:
         """Register the given function as a handler of the given event."""
 
+        # Set function attribute for future reference
+        handler.event = event
+
+        # Create default delegate if none exist
         if event not in self.delegates:
             self.delegates[event] = Delegate(event, self)
 
@@ -95,7 +109,7 @@ class Glass(Client, metaclass=Singleton):
     def decorate_event(self, event: str) -> typing.Callable:
         """Discord event registration decorator."""
 
-        def wrap(f: typing.Callable):
+        def dec(f: typing.Callable):
             self.register_event(event, f)
 
-        return wrap
+        return dec
