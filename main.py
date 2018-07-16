@@ -16,6 +16,8 @@ if __name__ == "__main__":
 
     # Note that if a module requires the use of a specific delegate,
     # that delegate must be registered before the module!
+    # TODO: Use register_delegate inside modules that require it?
+    # TODO: Allow for multiple delegate classes?
     glass.register_delegate("on_ready", Lens)
     glass.register_delegate("on_message", Arbiter)
 

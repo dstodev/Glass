@@ -1,8 +1,8 @@
 import typing
 
-from lib.obj.glass import Delegate
-
 import discord
+
+from lib.obj.glass import Delegate
 
 
 class Arbiter(Delegate):
@@ -20,7 +20,6 @@ class Arbiter(Delegate):
         super().__init__(event, *args)
 
     def modify_handler(self, handler: typing.Callable) -> typing.Callable:
-
         async def modifier(message: discord.Message):
             author = message.author  # type: discord.User
             await handler(message)

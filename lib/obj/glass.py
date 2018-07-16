@@ -3,13 +3,13 @@ import typing
 
 from discord import Client
 
-from lib.obj.singleton import Singleton
+from lib.util.singleton import Singleton
 
 
-class Delegate:
+class Delegate(metaclass=Singleton):
     """Handles any single event."""
 
-    _override_warning = True
+    _override_warning = True  # Ensures 'modify_handler' warning only outputs once per delegate
 
     def __init__(self, event: str, owner: "Glass"):
         self.event = event
@@ -44,7 +44,7 @@ class Delegate:
         """Modify the given handler to change how this delegate uses the handler.
         Must return an asynchronous (awaitable) callable."""
 
-        if type(self) is not Delegate and self._override_warning:
+        if self._override_warning and type(self) is not Delegate:
             print("Subclass '{}' of class 'Delegate' should override method 'modify_handler'!"
                   .format(self.__class__.__name__), file=sys.stderr)
             self._override_warning = False
@@ -68,14 +68,18 @@ class Glass(Client, metaclass=Singleton):
         super().run(*args, **kwargs)
 
     def register_delegate(self, event: str, delegate: typing.Type[Delegate]) -> None:
-        """Register a delegate class to handler a specific event."""
+        """Register a delegate class to handle a specific event."""
+
+        # TODO: Use priority system for multiple delegates, persistent data object (dict) passed from highest to lowest
+        # TODO: priorities
 
         delegate = delegate(event, self)
 
         if type(delegate) is Delegate:
-            raise ValueError("parameter 'delegate' must be subclass of class 'Delegate'!")
+            raise ValueError("Parameter 'delegate' must be subclass of class 'Delegate'!")
         else:
-            if event in self.delegates:
+            # TODO: Duplicate check fails if Delegate class is not a singleton
+            if event in self.delegates and self.delegates[event] is not delegate:
                 # If currently using a default delegate, move handlers to the new delegate
                 if type(self.delegates[event]) is Delegate:
                     handlers = self.delegates[event].handlers
@@ -89,7 +93,7 @@ class Glass(Client, metaclass=Singleton):
     def get_delegate(self, event: str, type_assertion: typing.Type = None) -> typing.Union[None, Delegate]:
         """Returns the delegate for the given event, if one exists."""
         if event in self.delegates:
-            if type_assertion and type_assertion is not type(self.delegates[event]):
+            if type_assertion and not issubclass(type_assertion, type(self.delegates[event])):
                 raise ValueError("Delegate for event '{}' is not of type '{}'!".format(event, type_assertion.__name__))
 
             return self.delegates[event]
