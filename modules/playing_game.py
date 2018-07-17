@@ -9,7 +9,7 @@ client = Glass()
 
 games = [
     "Yelling Simulator",
-    "Bit Shifter",
+    "Bit Shifter 2000",
     "Expansion Pack 4",
     "Cube Generator",
 ]
