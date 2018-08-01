@@ -7,8 +7,6 @@ from lib.util.singleton import Singleton
 
 
 class Delegate:
-    __slots__ = ("event", "fire", "meta")
-
     def __init__(self, event: str, fire: callable, meta: dict):
         self.event = event
         self.fire = fire
@@ -16,22 +14,14 @@ class Delegate:
 
     def __setattr__(self, key, value):
         """To set items using delegate.key = value"""
-        if key in self.__slots__:
+        if key in ("event", "fire", "meta"):
             object.__setattr__(self, key, value)
         else:
             self.meta[key] = value
 
     def __getattr__(self, item):
         """To access items using delegate.key"""
-        return self.meta[item]
-
-    def __setitem__(self, key, value):
-        """To set items using delegate[key] = value"""
-        self.meta[key] = value
-
-    def __getitem__(self, item):
-        """To access items using delegate[key]"""
-        return self.meta[item]
+        return self.meta.get(item, None)
 
 
 class Glass(Client, metaclass=Singleton):

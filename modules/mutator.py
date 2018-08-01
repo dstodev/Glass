@@ -8,13 +8,17 @@ client = Glass()
 @client.decorate_delegate("on_message")
 def permit(ctx: Delegate):
     fire = ctx.fire
-
-    ctx.test = 123
-    print(ctx.test)
+    if ctx.permission is None:
+        permission = discord.Permissions.none()
+    else:
+        permission = ctx.permission
 
     async def permitted_event(message: discord.Message):
+        channel = message.channel  # type: discord.Channel
         author = message.author  # type: discord.User
-        if author.permissions_in(message.channel):
+
+        # Apply permissions
+        if permission and author.permissions_in(channel) >= permission:
             await fire(message)
 
     ctx.fire = permitted_event
