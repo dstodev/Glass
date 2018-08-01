@@ -23,7 +23,10 @@ def permit(ctx: Delegate):
 
         # Apply permissions
         if author.permissions_in(channel) >= permission:
+            print(author.permissions_in(channel).value, permission.value)
             await fire(message)
+
+        # TODO: Notify user of lack of permission?
 
     # Overwrite handler with one with permissions
     ctx.fire = permitted_event
