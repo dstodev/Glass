@@ -13,7 +13,9 @@ async def cubic(message: discord.Message):
     if string:
         string = string.group(2)
         string = cubify(string)
-        await client.edit_message(message, string)
+        await client.send_message(message.channel, "`" + string + "`")
+
+    # TODO: Fix max length
 
 
 def cubify(*args):

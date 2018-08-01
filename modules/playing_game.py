@@ -37,3 +37,5 @@ async def playing_game_refresh(message: discord.Message):
             old_game = new_game
 
         await client.change_presence(game=discord.Game(name=new_game))
+
+    # TODO: Change game occasionally

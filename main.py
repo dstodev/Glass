@@ -18,7 +18,7 @@ if __name__ == "__main__":
         importlib.import_module("{}.{}".format(module_dir, module))
 
 
-    @glass.decorate_event("on_ready")
+    @glass.decorate_event("on_ready", hello="World!")
     async def initialize():
         # Example registration of an event handler.
         # Also indicates that all modules were successfully imported.
