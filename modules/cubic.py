@@ -6,11 +6,9 @@ from lib.obj.glass import Glass
 
 client = Glass()
 
-permission = discord.Permissions()
-permission.update(manage_messages=True)
 
-
-@client.decorate_event("on_message", permission=permission)
+@client.decorate_event("on_message", match=(r"^::cubic\s+(['\"])(.*)\1$", re.M | re.I),
+                       permissions={"manage_messages": True})
 async def cubic(message: discord.Message):
     string = re.search(r"^::cubic\s+(['\"])(.*)\1$", message.content, re.MULTILINE | re.IGNORECASE)
     if string:
