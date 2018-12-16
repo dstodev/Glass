@@ -1,6 +1,5 @@
 import re
-import sys
-import os
+
 import discord
 
 from lib.obj.glass import Glass
@@ -9,9 +8,9 @@ glass = Glass()
 
 
 # TODO: Automatically register this event for every script?
-@glass.decorate_event("on_ready")
-async def announce():
-    print("Module '{}' loaded!".format(os.path.basename(__file__)), file=sys.stderr)
+# @glass.decorate_event("on_ready")
+# async def announce():
+#     print("Module '{}' loaded!".format(os.path.basename(__file__)), file=sys.stderr)
 
 
 @glass.decorate_event("on_message")

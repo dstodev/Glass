@@ -3,7 +3,7 @@ import typing
 
 from discord import Client
 
-from lib.util.singleton import Singleton
+from lib.obj.singleton import Singleton
 
 
 class Delegate:
@@ -57,7 +57,6 @@ class Glass(Client, metaclass=Singleton):
         # Register all events
         for event in self.handlers:
             super().event(self._handler(event))
-        # [super().event(self._handler(event)) for event in self.handlers]
 
         # Start Glass
         super().run(*args, **kwargs)
@@ -71,10 +70,6 @@ class Glass(Client, metaclass=Singleton):
 
         # Attach extra data to the handler
         context = Delegate(event, f, kwargs)
-
-        # context = types.SimpleNamespace(**kwargs)
-        # context.event = event
-        # context.fire = f
 
         # Add handler to event handler list
         self.handlers[event].append(context)

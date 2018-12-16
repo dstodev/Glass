@@ -7,8 +7,8 @@ from lib.obj.glass import Glass
 client = Glass()
 
 
-@client.decorate_event("on_message", match=(r"^::cubic\s+(['\"])(.*)\1$", re.M | re.I),
-                       permissions={"manage_messages": True})
+@client.decorate_event("on_message", match=(r"^::cubic\s+(['\"])(.*)\1$", re.M | re.I))
+                       #permissions={"manage_messages": True})
 async def cubic(message: discord.Message):
     string = re.search(r"^::cubic\s+(['\"])(.*)\1$", message.content, re.MULTILINE | re.IGNORECASE)
     if string:
@@ -31,7 +31,7 @@ def cubify(*args):
     cube += " ".join(meme)
     cube += "\n"
 
-    # b           f::c
+    # b           f
     # c           e
     for i in range(mid - 1):
         cube += meme[i + 1]

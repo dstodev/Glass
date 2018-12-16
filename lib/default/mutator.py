@@ -1,6 +1,6 @@
 import discord
 
-from lib.obj.glass import Glass, Delegate
+from lib.obj.glass import Delegate, Glass
 
 client = Glass()
 
@@ -12,7 +12,7 @@ def permit(ctx: Delegate):
     fire = ctx.fire
 
     # Create permissions object
-    if ctx.permission is None:
+    if ctx.permissions is None:
         permissions = discord.Permissions.none()
     else:
         if isinstance(ctx.permissions, dict):
@@ -28,7 +28,6 @@ def permit(ctx: Delegate):
 
         # Apply permissions
         if author.permissions_in(channel) >= permissions:
-            print(author.permissions_in(channel).value, permissions.value)
             await fire(message)
 
         # TODO: Notify user of lack of permission?
